@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import mercadopago from "mercadopago"; // Asegúrate de importar la biblioteca de MercadoPago adecuadamente
+// Asegúrate de importar la biblioteca de MercadoPago adecuadamente
 import prismadb from "@/lib/prismadb";
-
+const mercadopago = require("mercadopago")
 // Configura las credenciales de MercadoPago (reemplaza con tus propias credenciales)
 mercadopago.configure({
     access_token: process.env.MERCADOPAGO_ACCESS_TOKEN
