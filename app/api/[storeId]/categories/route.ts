@@ -8,14 +8,14 @@ export async function POST(
     try{
         const {userId} =auth();
         const body = await req.json();
-        const {name,billboardId}=body
+        const {name,destacadoId}=body
         if(!userId){
             return new NextResponse("No autenticado",{status:403})
         }
         if(!name){
             return new NextResponse("Se requiere una etiqueta.",{status:400});
         }
-        if(!billboardId){
+        if(!destacadoId){
             return new NextResponse("Se requiere el ID del cartel destacado.",{status:400});
         }
         if (!params.storeId){
@@ -33,7 +33,7 @@ export async function POST(
         const category = await prismadb.category.create({
             data:{
                 name,
-                billboardId,
+                destacadoId,
                 storeId: params.storeId,
             }
         });

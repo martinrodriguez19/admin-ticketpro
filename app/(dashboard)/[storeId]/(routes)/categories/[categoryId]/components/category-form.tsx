@@ -2,7 +2,7 @@
 import axios from "axios";
 import * as z from "zod";
 import { useState } from "react";
-import { Billboard, Category} from "@prisma/client";
+import { Destacado, Category} from "@prisma/client";
 import {Heading} from "@/components/ui/heading";
 import {Button} from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -19,18 +19,18 @@ import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@
 
 const formSchema = z.object({
     name: z.string().min(1),
-    billboardId: z.string().min(1),
+    destacadoId: z.string().min(1),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>;
 interface CategoryFormProps{
     initialData: Category | null;
-    billboards: Billboard[];
+    destacados: Destacado[];
 }
 
 export const CategoryForm:React.FC<CategoryFormProps> = ({
     initialData,
-    billboards
+    destacados
 }) =>{
     const params = useParams();
     const router = useRouter();
@@ -45,7 +45,7 @@ export const CategoryForm:React.FC<CategoryFormProps> = ({
         resolver:zodResolver(formSchema),
         defaultValues: initialData || {
             name:'',
-            billboardId:''
+            destacadoId:''
         }
     });
     const onSubmit = async (data:CategoryFormValues)=>{
@@ -122,7 +122,7 @@ export const CategoryForm:React.FC<CategoryFormProps> = ({
                     />
                     <FormField
                     control={form.control}
-                    name="billboardId"
+                    name="destacadoId"
                     render={({field})=>(
                         <FormItem>
                             <FormLabel>Destacado</FormLabel>
@@ -136,12 +136,12 @@ export const CategoryForm:React.FC<CategoryFormProps> = ({
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {billboards.map((billboard)=>(
+                                    {destacados.map((destacado)=>(
                                         <SelectItem
-                                        key={billboard.id}
-                                        value={billboard.id}
+                                        key={destacado.id}
+                                        value={destacado.id}
                                         >
-                                            {billboard.label}
+                                            {destacado.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

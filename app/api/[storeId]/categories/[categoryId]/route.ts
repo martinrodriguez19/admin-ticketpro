@@ -17,7 +17,7 @@ export async function GET (
                 id:params.categoryId,
             },
             include:{
-                billboard:true,
+                destacado:true,
             }
         });
         return NextResponse.json(category);
@@ -34,14 +34,14 @@ export async function PATCH (
     try{
         const {userId} = auth();
         const body= await req.json();
-        const {name, billboardId} = body;
+        const {name, destacadoId} = body;
         if(!userId){
             return new NextResponse("No autenticado",{status:403})
         }
         if(!name){
             return new NextResponse("Se requiere una etiqueta",{status:400});
         }        
-        if(!billboardId){
+        if(!destacadoId){
             return new NextResponse("Se requiere el ID del cartel destacado",{status:400});
         }
         if(!params.categoryId){
@@ -63,7 +63,7 @@ export async function PATCH (
             },
             data:{
                 name,
-                billboardId
+                destacadoId
             }
         });
         return NextResponse.json(category);

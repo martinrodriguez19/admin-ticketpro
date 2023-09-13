@@ -21,21 +21,21 @@ export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
-  const { productIds } = await req.json();
-  if (!productIds || productIds.length === 0) {
+  const { eventoIds } = await req.json();
+  if (!eventoIds || eventoIds.length === 0) {
     return new NextResponse("Se requieren los IDs de los eventos.", { status: 400 });
   }
-  const products = await prismadb.product.findMany({
+  const eventos = await prismadb.evento.findMany({
     where: {
       id: {
-        in: productIds,
+        in: eventoIds,
       },
     },
   });
 
-  const items = products.map((product) => ({
-    title: product.name,
-    unit_price: product.price.toNumber(),
+  const items = eventos.map((evento) => ({
+    title: evento.name,
+    unit_price: evento.price.toNumber(),
     quantity: 1,
   }));
 

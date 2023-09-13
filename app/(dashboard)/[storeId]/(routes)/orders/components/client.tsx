@@ -18,7 +18,7 @@ export const OrderClient: React.FC<OrderClientProps> = ({
             <Heading title={`Orders(${data.length})`} 
             description="Gestionar entradas de tu evento."/>
             <Separator />
-            <DataTable searchKey="products" columns={columns} data={data}/>
+            <DataTable searchKey="eventos" columns={columns} data={data}/>
         </>
     )
 }

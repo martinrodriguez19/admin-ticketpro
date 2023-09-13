@@ -14,19 +14,19 @@ model Store{
   id        String   @id @default(uuid())
   name      String
   userId    String
-  billboards Billboard[] @relation("StoreToBillboard")
+  destacados Destacado[] @relation("StoreToDestacado")
   categories Category[] @relation("StoreToCategory")
-  sizes     Size[] @relation("StoreToSize")
-  colors    Color[] @relation("StoreToColor")
-  products  Product[] @relation("StoreToProduct")
+  fechas     Fecha[] @relation("StoreToFecha")
+  ubicacions    Ubicacion[] @relation("StoreToUbicacion")
+  eventos  Evento[] @relation("StoreToEvento")
   orders Order[] @relation("StoreToOrder")
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-model Billboard{
+model Destacado{
   id String @id @default(uuid())
   storeId String
-  store Store @relation("StoreToBillboard", fields: [storeId], references: [id])
+  store Store @relation("StoreToDestacado", fields: [storeId], references: [id])
   label String
   imageUrl String
   categories Category[]
@@ -38,51 +38,51 @@ model Category{
   id String @id @default(uuid())
   storeId String
   store Store @relation("StoreToCategory",fields: [storeId],references: [id])
-  billboardId String
-  billboard Billboard @relation(fields: [billboardId],references: [id])
-  products Product[] @relation("CategoryToProduct")
+  destacadoId String
+  destacado Destacado @relation(fields: [destacadoId],references: [id])
+  eventos Evento[] @relation("CategoryToEvento")
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([storeId])
-  @@index([billboardId])
+  @@index([destacadoId])
 }
-model Size{
+model Fecha{
   id String @id @default(uuid())
   storeId String
-  store Store @relation("StoreToSize",fields: [storeId],references: [id])
-  name String
-  value String
-  products Product[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([storeId])
-}
-model Color{
-  id String @id @default(uuid())
-  storeId String
-  store Store @relation("StoreToColor",fields: [storeId],references: [id])
+  store Store @relation("StoreToFecha",fields: [storeId],references: [id])
   name String
   value String
-  products Product[]
+  eventos Evento[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([storeId])
 }
-model Product{
+model Ubicacion{
   id String @id @default(uuid())
   storeId String
-  store Store @relation("StoreToProduct",fields: [storeId],references: [id])
+  store Store @relation("StoreToUbicacion",fields: [storeId],references: [id])
+  name String
+  value String
+  eventos Evento[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([storeId])
+}
+model Evento{
+  id String @id @default(uuid())
+  storeId String
+  store Store @relation("StoreToEvento",fields: [storeId],references: [id])
   categoryId String
-  category Category @relation("CategoryToProduct",fields: [categoryId], references: [id])
+  category Category @relation("CategoryToEvento",fields: [categoryId], references: [id])
   name String
   price Decimal
   isFeatured Boolean @default(false)
   isArchived Boolean @default(false)
-  sizeId String
-  size Size @relation(fields: [sizeId],references: [id])
-  colorId String
-  color Color @relation(fields: [colorId], references: [id])
+  fechaId String
+  fecha Fecha @relation(fields: [fechaId],references: [id])
+  ubicacionId String
+  ubicacion Ubicacion @relation(fields: [ubicacionId], references: [id])
   images Image[]
   orderItems OrderItem[]
   createdAt DateTime @default(now())
@@ -90,17 +90,17 @@ model Product{
 
   @@index([storeId])
   @@index([categoryId])
-  @@index([sizeId])
-  @@index([colorId])
+  @@index([fechaId])
+  @@index([ubicacionId])
 }
 model Image {
   id String @id @default(uuid())
-  productId String
-  product Product @relation(fields: [productId],references: [id], onDelete: Cascade)
+  eventoId String
+  evento Evento @relation(fields: [eventoId],references: [id], onDelete: Cascade)
   url String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@index([productId])
+  @@index([eventoId])
   }
 
 model Order {
@@ -121,9 +121,9 @@ model OrderItem{
   id String @id @default(uuid())
   orderId String
   order Order @relation(fields: [orderId], references: [id])
-  productId String
-  product Product @relation(fields: [productId], references: [id])
+  eventoId String
+  evento Evento @relation(fields: [eventoId], references: [id])
 
   @@index([orderId])
-  @@index([productId])
+  @@index([eventoId])
 }

@@ -80,6 +80,7 @@ export default function StoreSwitcher({
                         </CommandGroup>
                     </CommandList>
                 </Command>
+                
             </PopoverContent>
         </Popover>
     )

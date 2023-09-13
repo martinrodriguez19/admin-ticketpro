@@ -15,7 +15,7 @@ const OrdersPage = async (
         include:{
             orderItems:{
                 include:{
-                    product:true
+                    evento:true
                 }
             }
         },
@@ -27,9 +27,9 @@ const OrdersPage = async (
         id:item.id,
         phone: item.phone,
         address: item.address,
-        products: item.orderItems.map((orderItem)=> orderItem.product.name).join(', '),
+        eventos: item.orderItems.map((orderItem)=> orderItem.evento.name).join(', '),
         totalPrice: formatter.format(item.orderItems.reduce((total,item)=>{
-            return total + Number(item.product.price)
+            return total + Number(item.evento.price)
         },0)),
         isPaid:item.isPaid,
         createdAt: format(item.createdAt,"MMMM do, yyyy")
