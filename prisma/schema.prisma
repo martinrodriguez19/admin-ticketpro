@@ -15,6 +15,7 @@ model Store{
   name      String
   userId    String
   destacados Destacado[] @relation("StoreToDestacado")
+  entradas Entrada[] @relation("StoreToEntrada")
   categories Category[] @relation("StoreToCategory")
   fechas     Fecha[] @relation("StoreToFecha")
   ubicacions    Ubicacion[] @relation("StoreToUbicacion")
@@ -58,6 +59,18 @@ model Fecha{
   updatedAt DateTime @updatedAt
   @@index([storeId])
 }
+model Entrada{
+  id String @id @default(uuid())
+  storeId String
+  store Store @relation("StoreToEntrada",fields: [storeId],references: [id])
+  name String
+  value String
+  quantity String
+  eventos Evento[] @relation("EntradaToEvento")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([storeId])
+}
 model Ubicacion{
   id String @id @default(uuid())
   storeId String
@@ -75,6 +88,8 @@ model Evento{
   store Store @relation("StoreToEvento",fields: [storeId],references: [id])
   categoryId String
   category Category @relation("CategoryToEvento",fields: [categoryId], references: [id])
+  entradaId String
+  entrada Entrada @relation("EntradaToEvento",fields: [entradaId],references: [id])
   name String
   price Decimal
   isFeatured Boolean @default(false)

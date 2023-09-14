@@ -22,10 +22,10 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
         active: pathname === `/${params.storeId}/eventos`,
     },
     {
-        href:`/${params.storeId}/destacados`,
-        label: 'Destacado',
-        active: pathname === `/${params.storeId}/destacados`,
-    },
+      href:`/${params.storeId}/entradas`,
+      label: 'Entradas',
+      active: pathname === `/${params.storeId}/entradas`,
+  },
     {
         href:`/${params.storeId}/categories`,
         label: 'Categoria',
@@ -45,6 +45,11 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
         href:`/${params.storeId}/orders`,
         label: 'Ordenes',
         active: pathname === `/${params.storeId}/orders`,
+    },
+    {
+        href:`/${params.storeId}/destacados`,
+        label: 'Destacado',
+        active: pathname === `/${params.storeId}/destacados`,
     },
     {
     href:`/${params.storeId}/settings`,
