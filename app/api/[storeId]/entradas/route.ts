@@ -8,12 +8,9 @@ export async function POST(
     try{
         const {userId} =auth();
         const body = await req.json();
-        const {name,value,quantity}=body
+        const {name, values}=body; 
         if(!userId){
-            return new NextResponse("No autenticado",{status:403})
-        }
-        if(!value){
-            return new NextResponse("El valor es requerido",{status:400});
+            return new NextResponse("No autenticado",{status:403});
         }
         if (!params.storeId){
             return new NextResponse("El ID del local es requerido",{status:400});
@@ -23,22 +20,30 @@ export async function POST(
                 id:params.storeId,
                 userId
             }
-        })
+        });
         if(!storeByUserId){
             return new NextResponse("No autenticado",{status:405});
         }
         const entrada = await prismadb.entrada.create({
             data:{
                 name,
-                value,
-                quantity,
                 storeId: params.storeId,
+                entradaValues: {
+                    create: values.map(val => ({ 
+                        name: val.names, 
+                        value: val.value, 
+                        quantity: val.quantity 
+                    }))
+                }
+            },
+            include: {
+                entradaValues: true  // Incluye los valores de EntradaValue en la respuesta
             }
         });
         return NextResponse.json(entrada);
     }catch(error){
         console.log('[ENTRADAS_POST]',error);
-        return new NextResponse("Interal error",{status:500});
+        return new NextResponse("Internal error",{status:500});
     }
 };
 export async function GET(
@@ -52,12 +57,14 @@ export async function GET(
         const entradas = await prismadb.entrada.findMany({
             where:{
                 storeId: params.storeId,
-
+            },
+            include: {
+                entradaValues: true  // Incluye los valores de EntradaValue en la respuesta
             }
         });
         return NextResponse.json(entradas);
     }catch(error){
         console.log('[ENTRADAS_GET]',error);
-        return new NextResponse("Interal error",{status:500});
+        return new NextResponse("Internal error",{status:500});
     }
 };

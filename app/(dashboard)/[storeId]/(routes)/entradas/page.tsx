@@ -14,18 +14,29 @@ const EntradasPage = async ({
     where: {
       storeId: params.storeId
     },
+    include: {
+      entradaValues: true // Incluir las EntradaValue asociadas con cada Entrada
+    },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
-  const formattedEntradas: EntradaColumn[] = entradas.map((item) => ({
-    id: item.id,
-    name: item.name,
-    value: item.value,
-    quantity: item.quantity,
-    createdAt: format(item.createdAt, 'MMMM do, yyyy'),
-  }));
+  const formattedEntradas: EntradaColumn[] = entradas.map((item) => {
+    // Extraer y formatear los valores de las EntradaValue asociadas
+    const names = item.entradaValues.map(ev => ev.names).join(', ');
+    const value = item.entradaValues.map(ev => `$${ev.value}`).join(', ');
+    const quantity = item.entradaValues.map(ev => ev.quantity).join(', ');
+
+    return {
+      id: item.id,
+      name: item.name,
+      names: names,  
+      value: value, 
+      quantity: quantity, 
+      createdAt: format(item.createdAt, 'MMMM do, yyyy'),
+    };
+  });
 
   return (
     <div className="flex-col">

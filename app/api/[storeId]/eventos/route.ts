@@ -13,7 +13,6 @@ export async function POST(
             price,
             categoryId,
             ubicacionId,
-            entradaId,
             fechaId,
             images,
             isFeatured,
@@ -24,9 +23,6 @@ export async function POST(
         }
         if(!name){
             return new NextResponse("Name is required",{status:400});
-        }
-        if(!entradaId){
-            return new NextResponse("Entrada is required",{status:400});
         }
         if(!images || !images.length){
             return new NextResponse("Images are required",{status:400});
@@ -59,7 +55,6 @@ export async function POST(
             data:{
                 name,
                 price,
-                entradaId,
                 isFeatured,
                 isArchived,
                 categoryId,
@@ -89,7 +84,6 @@ export async function GET(
         const {searchParams} = new URL(req.url);
         const categoryId = searchParams.get("categoryId") || undefined 
         const ubicacionId = searchParams.get("ubicacionId") || undefined
-        const entradaId = searchParams.get("ubicacionId") || undefined
         const fechaId = searchParams.get("fechaId") || undefined  
         const isFeatured = searchParams.get("isFeatured") || undefined 
         if (!params.storeId){

@@ -23,14 +23,21 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
-
+import { InputE } from "@/components/ui/inputE"
 const formSchema = z.object({
   name: z.string().min(1),
-  value: z.string().min(1),
-  quantity: z.string().min(1),
+  entries: z.array(
+    z.object({
+      names: z.string().min(1),
+      value: z.number(),
+      quantity: z.number(),
+    })
+  ),
 });
 
-type EntradaFormValues = z.infer<typeof formSchema>
+
+type EntradaFormValues = z.infer<typeof formSchema>;
+
 
 interface EntradaFormProps {
   initialData: Entrada | null;
@@ -53,18 +60,29 @@ export const EntradaForm: React.FC<EntradaFormProps> = ({
   const form = useForm<EntradaFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      name: ''
-    }
+      name: '',
+      names: [],
+      value: [],
+      quantity: [],
+   }   
   });
-
   const onSubmit = async (data: EntradaFormValues) => {
     try {
       setLoading(true);
+      
+      // Guardar o actualizar Entrada
+      let entrada;
       if (initialData) {
-        await axios.patch(`/api/${params.storeId}/entradas/${params.entradaId}`, data);
+        entrada = await axios.patch(`/api/${params.storeId}/entradas/${params.entradaId}`, { name: data.name });
       } else {
-        await axios.post(`/api/${params.storeId}/entradas`, data);
+        entrada = await axios.post(`/api/${params.storeId}/entradas`, { name: data.name });
       }
+  
+      // Luego, guardar o actualizar EntradaValue para cada entrada
+      for (const entry of data.entries) {
+        await axios.post(`/api/${params.storeId}/entradas/${entrada.data.id}/values`, entry);
+      }
+      
       router.refresh();
       router.push(`/${params.storeId}/entradas`);
       toast.success(toastMessage);
@@ -74,7 +92,7 @@ export const EntradaForm: React.FC<EntradaFormProps> = ({
       setLoading(false);
     }
   };
-
+  
   const onDelete = async () => {
     try {
       setLoading(true);
@@ -88,6 +106,56 @@ export const EntradaForm: React.FC<EntradaFormProps> = ({
       setLoading(false);
       setOpen(false);
     }
+  }
+  const [entradas, setEntradas] = useState<Array<{ id: number }>>([{ id: Date.now() }]);
+
+  const addEntrada = () => {
+    setEntradas([...entradas, { id: Date.now() }]);
+  };
+  const FormEntrada: React.FC<{ uniqueId: number }> = ({ uniqueId }) => {
+    return (
+      <>
+        <FormField
+              control={form.control}
+              name={`entries[${uniqueId}].names`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <InputE disabled={loading} placeholder="Preventa 1" value={field.value?.names || ''}  {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`entries[${uniqueId}].value`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Precio</FormLabel>
+                  <FormControl>
+                    <InputE disabled={loading} placeholder="0.000" value={field.value?.value || ''}   type="number"  {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`entries[${uniqueId}].quantity`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cantidad</FormLabel>
+                  <FormControl>
+                    <InputE disabled={loading} placeholder="100" type="number" value={field.value?.quantity || ''}   {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+      </>
+    )
   }
 
   return (
@@ -114,47 +182,28 @@ export const EntradaForm: React.FC<EntradaFormProps> = ({
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre</FormLabel>
+                  <FormLabel>Evento</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Preventa1"  {...field} />
+                    <Input disabled={loading} placeholder="Evento"  {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Precio</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="0.000"   {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cantidad</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="100"  {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            />          
+          <div className="md:grid md:grid-cols-3 gap-8">
+          {entradas.map((entrada) => (
+            <FormEntrada key={entrada.id} uniqueId={entrada.id} />
+          ))}
           </div>
+          <button  className="ml-auto" onClick={addEntrada} >
+            Añadir Nueva Entrada
+          </button>          
+          <br/>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>

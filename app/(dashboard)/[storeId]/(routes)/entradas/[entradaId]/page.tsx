@@ -9,6 +9,9 @@ const EntradaPage = async ({
     const entrada = await prismadb.entrada.findUnique({
         where:{
             id: params.entradaId
+        },
+        include: {
+            entradaValues: true
         }
     });
     return(

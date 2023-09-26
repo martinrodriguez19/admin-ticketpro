@@ -20,7 +20,7 @@ export const EntradasClient: React.FC<EntradasClientProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
-
+  
   return (
     <>
       <div className="flex items-center justify-between">

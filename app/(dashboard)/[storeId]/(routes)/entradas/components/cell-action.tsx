@@ -83,6 +83,33 @@ export const CellAction: React.FC<CellActionProps> = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <AlertModal 
+        isOpen={open} 
+        onClose={() => setOpen(false)}
+        onConfirm={onConfirm}
+        loading={loading}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+        <span className="sr-only">Abrir Menu</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+          <Copy className="mr-2 h-4 w-4" /> Copiar ID
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/entradas/${data.id}`)}>
+          <Edit className="mr-2 h-4 w-4" /> Actualizar
+          </DropdownMenuItem>
+          {/* Aquí, añadimos una opción para editar EntradaValue */}
+          <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/entradas/${data.id}/values/${data.valueId}`)}>
+            <Edit className="mr-2 h-4 w-4" /> Actualizar Valor
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <Trash className="mr-2 h-4 w-4" /> Eliminar
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };

@@ -23,26 +23,30 @@ export async function GET (
         return new NextResponse("Internal error",{status:500});
     }
 };
-export async function PATCH (
+export async function PATCH(
     req: Request,
-    {params}:{params:{storeId:string, entradaId:string}}
+    { params }: { params: { storeId: string; entradaId: string } }
+) {
+    try {
+        const { userId } = auth();
+        const body = await req.json();
+        const { name, names, value, quantity } = body;
 
-){
-    try{
-        const {userId} = auth();
-        const body= await req.json();
-        const {name,value} = body;
-        if(!userId){
-            return new NextResponse("No autenticado",{status:403})
-        }     
-        if(!name){
-            return new NextResponse("La entrada es requerida",{status:400});
+        // Validaciones
+        if (!userId) {
+            return new NextResponse("No autenticado", { status: 403 });
         }
-        if(!value){
-            return new NextResponse("La hora es requerida",{status:400});
+        if (!name) {
+            return new NextResponse("El nombre es requerido", { status: 400 });
         }
-        if(!params.entradaId){
-            return new NextResponse("El ID de la entrada es requerido", {status:400})
+        if (!names || names.length === 0) {
+            return new NextResponse("Los nombres son requeridos", { status: 400 });
+        }
+        if (!value || value.length === 0) {
+            return new NextResponse("El valor es requerido", { status: 400 });
+        }
+        if (!quantity || quantity.length === 0) {
+            return new NextResponse("La cantidad es requerida", { status: 400 });
         }
         const storeByUserId = await prismadb.store.findFirst({
             where:{
@@ -54,15 +58,25 @@ export async function PATCH (
             return new NextResponse("No autenticado",{status:405})
         }
         const entrada = await prismadb.entrada.update({
-            where:{
-                id:params.entradaId,
-                
+            where: {
+                id: params.entradaId,
             },
-            data:{
+            data: {
                 name,
-                value
+                entradaValues: {
+                    // Esto creará/actualizará las EntradaValues asociadas
+                    upsert: names.map((n, idx) => ({
+                        where: { id: n.id || undefined },
+                        update: { name: n, value: value[idx], quantity: quantity[idx] },
+                        create: { name: n, value: value[idx], quantity: quantity[idx] }
+                    })),
+                }
+            },
+            include: {
+                entradaValues: true
             }
         });
+
         return NextResponse.json(entrada);
     }catch(error){
         console.log('[ENTRADA_PATCH]',error);
@@ -72,11 +86,9 @@ export async function PATCH (
 export async function DELETE (
     req: Request,
     {params}:{params:{storeId:string,entradaId:string}}
-
 ){
     try{
         const {userId} = auth();
-
         if(!userId){
             return new NextResponse("Unauthenticated",{status:403})
         }
@@ -92,11 +104,19 @@ export async function DELETE (
         if(!storeByUserId){
             return new NextResponse("Unauthorized",{status:405})
         }
+        await prismadb.entradaValue.deleteMany({
+            where:{
+                entradaId: params.entradaId
+            }
+        });
+
+        // Ahora eliminar la entrada principal
         const entrada = await prismadb.entrada.delete({
             where:{
                 id:params.entradaId,
             }
         });
+
         return NextResponse.json(entrada);
     }catch(error){
         console.log('[ENTRADA_DELETE]',error);
